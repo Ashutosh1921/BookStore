@@ -33,3 +33,27 @@ func (b *Book) CreateBook() *Book {
 	db.Create(b)
 	return b
 }
+
+func GetAllBook() []Book {
+	var Books []Book
+	db.Find(&Books)
+	return Books
+}
+
+func GetBookByid(id int64) (*Book, *gorm.DB) {
+	var getbook Book
+	db := db.Where("ID=?", id).Find(&getbook)
+	return &getbook, db
+}
+
+func DeleteBook(id int64) Book {
+	// var book Book
+	// db.Find("ID=?", id).Delete(book)
+	// return book
+	// this is gpt code more safe
+	var book Book
+	db.Where("ID=?", id).First(&book)
+	db.Delete(&book)
+	return book
+
+}
