@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	models "github.com/Ashutosh1921/BookStore/pkg/Models"
+	utils "github.com/Ashutosh1921/BookStore/pkg/Utils"
 	"github.com/gorilla/mux"
 )
 
@@ -45,4 +46,35 @@ func GetBookid(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 	// res will get converted into http response
+}
+
+func CreateBook(w http.ResponseWriter, r *http.Request) {
+	createBook := models.Book{}
+	utils.ParseBody(r, createBook)
+	// Now parsing the request body into empty book struct
+	b := createBook.CreateBook()
+	// here we are calling CreateBook a receiver function of type Book
+	// which create a this new book inside the database.
+	res, _ := json.Marshal(b)
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+
+}
+
+func DeleteBook(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	bookId := vars["bookId"]
+	// finding a bookid variable and assign it to the bookId
+	ID, err := strconv.ParseInt(bookId, 0, 0)
+	// here changing string to int with automatic base and automatic bit size by filling 0,0
+	if err != nil {
+		fmt.Println("error while parsing")
+	}
+	// Now that we got the id of the book we delete that from the database
+	book := models.DeleteBook(ID)
+	// Now that book is deleted and also got details of book
+	res, _ := json.Marshal(book)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
