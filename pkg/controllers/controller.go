@@ -78,3 +78,35 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
+
+func UpdateBook(w http.ResponseWriter, r *http.Request) {
+	var updateBook = &models.Book{}
+	// gettting address of empty book
+	utils.ParseBody(r, updateBook)
+	// parsing the json request into the empty book variable
+	vars := mux.Vars(r)
+	bookId := vars["bookId"]
+	ID, err := strconv.ParseInt(bookId, 0, 0)
+	// here changing string to int with automatic base and automatic bit size by filling 0,0
+	if err != nil {
+		fmt.Println("error while parsing")
+	}
+	bookdetails, db := models.GetBookByid(ID)
+	if updateBook.Name != "" {
+		bookdetails.Name = updateBook.Name
+		// Now we are filling new data we got from the updatbook
+	}
+	if updateBook.Author != "" {
+		bookdetails.Author = updateBook.Author
+	}
+	if updateBook.Publication != "" {
+		bookdetails.Publication = updateBook.Publication
+	}
+	// Now we have updated the bookdetail we are saving it to database
+	db.Save(&bookdetails)
+	// db.Save is used to update the database if anything is updated.
+	res, _ := json.Marshal(bookdetails)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
